@@ -1,3 +1,18 @@
+## DolceSDK Toolchain CMake macros
+## Copyright (C) 2020 浅倉麗子
+##
+## This program is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, version 3 of the License.
+##
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 ## Copyright (C) 2016 Yifan Lu
 ## See LICENSE/vitasdk
 
@@ -82,12 +97,12 @@ macro(vita_create_self target source)
   )
 
   ## SELF target
-  add_custom_target(${target}
+  add_custom_target(${target}.target
     ALL
     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${target}
   )
   if(TARGET ${source})
-    add_dependencies(${target} ${source})
+    add_dependencies(${target}.target ${source})
   endif()
 endmacro(vita_create_self)
 ##################################################
@@ -237,12 +252,12 @@ macro(vita_create_vpk target titleid eboot)
   )
 
   ## VPK target
-  add_custom_target(${target}
+  add_custom_target(${target}.target
     ALL
     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${target}
   )
   if(TARGET ${eboot})
-    add_dependencies(${target} ${eboot})
+    add_dependencies(${target}.target ${eboot})
   endif()
 endmacro(vita_create_vpk)
 ##################################################
