@@ -1,7 +1,5 @@
 ## Copyright (C) 2016 Yifan Lu
-##
-## This software may be modified and distributed under the terms
-## of the MIT license.  See the LICENSE file for details.
+## See LICENSE/vitasdk
 
 ## Advanced users may be interested in setting the following
 ##   - VITA_ELF_CREATE_FLAGS
