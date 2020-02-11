@@ -128,7 +128,7 @@ static int usage(int argc, char *argv[])
 					"\t-n         :    allow empty imports\n"
 					"\t-e yml     :    optional config options\n"
 					"\tinput.elf  :    input ARM ET_EXEC type ELF\n"
-					"\toutput.velf:    output ET_SCE_RELEXEC type ELF\n", argc > 0 ? argv[0] : "vita-elf-create");
+					"\toutput.velf:    output ET_SCE_RELEXEC type ELF\n", argc > 0 ? argv[0] : "dolce-elf-create");
 	return 0;
 }
 

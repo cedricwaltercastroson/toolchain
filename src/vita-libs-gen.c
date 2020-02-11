@@ -258,10 +258,10 @@ int generate_cmake(vita_imports_t **imports, int imports_count)
 	fputs(
 		"cmake_minimum_required(VERSION 2.8)\n\n"
 		"if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)\n"
-		"\tif(DEFINED ENV{VITASDK})\n"
-		"\t\tset(CMAKE_TOOLCHAIN_FILE \"$ENV{VITASDK}/share/vita.toolchain.cmake\" CACHE PATH \"toolchain file\")\n"
+		"\tif(DEFINED ENV{DOLCESDK})\n"
+		"\t\tset(CMAKE_TOOLCHAIN_FILE \"$ENV{DOLCESDK}/share/dolce.toolchain.cmake\" CACHE PATH \"toolchain file\")\n"
 		"\telse()\n"
-		"\t\tmessage(FATAL_ERROR \"Please define VITASDK to point to your SDK path!\")\n"
+		"\t\tmessage(FATAL_ERROR \"Please define DOLCESDK to point to your SDK path!\")\n"
 		"\tendif()\n"
 		"endif()\n"
 		"project(vitalibs)\n"
@@ -341,7 +341,7 @@ int generate_cmake(vita_imports_t **imports, int imports_count)
 			"foreach(library ${KERNEL_LIBRARIES})\n"
 			"\tadd_library(${library}_stub STATIC ${${library}_ASM})\n"
 			"\ttarget_compile_definitions(${library}_stub PRIVATE -DGEN_WEAK_EXPORTS=0)\n"
-			"\tinstall(TARGETS ${library}_stub DESTINATION $ENV{VITASDK}/arm-vita-eabi/lib/)\n"
+			"\tinstall(TARGETS ${library}_stub DESTINATION $ENV{DOLCESDK}/arm-dolce-eabi/lib/)\n"
 			"endforeach(library)\n\n", fp);
 	}
 
@@ -364,10 +364,10 @@ int generate_makefile(vita_imports_t **imports, int imports_count)
 	g_kernel_objs[0] = '\0';
 
 	fputs(
-		"ifdef VITASDK\n"
-		"PREFIX = $(VITASDK)/bin/\n"
+		"ifdef DOLCESDK\n"
+		"PREFIX = $(DOLCESDK)/bin/\n"
 		"endif\n\n"
-		"ARCH ?= $(PREFIX)arm-vita-eabi\n"
+		"ARCH ?= $(PREFIX)arm-dolce-eabi\n"
 		"AS = $(ARCH)-as\n"
 		"AR = $(ARCH)-ar\n"
 		"RANLIB = $(ARCH)-ranlib\n\n"
@@ -485,8 +485,8 @@ int generate_makefile(vita_imports_t **imports, int imports_count)
 		"$(foreach library,$(TARGETS),$(eval $(call LIBRARY_template,$(library))))\n"
 		"$(foreach library,$(TARGETS_WEAK),$(eval $(call LIBRARY_WEAK_template,$(library))))\n\n"
 		"install: $(TARGETS) $(TARGETS_WEAK)\n"
-		"\tcp $(TARGETS) $(VITASDK)/arm-vita-eabi/lib\n"
-		"\tcp $(TARGETS_WEAK) $(VITASDK)/arm-vita-eabi/lib\n\n"
+		"\tcp $(TARGETS) $(DOLCESDK)/arm-dolce-eabi/lib\n"
+		"\tcp $(TARGETS_WEAK) $(DOLCESDK)/arm-dolce-eabi/lib\n\n"
 		"clean:\n"
 		"\trm -f $(TARGETS) $(TARGETS_WEAK) $(ALL_OBJS)\n\n"
 		"$(TARGETS) $(TARGETS_WEAK):\n"
