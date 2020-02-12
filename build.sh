@@ -37,7 +37,7 @@ cmake -G"Unix Makefiles" \
 	-DBUILD_SHARED_LIBS=`[ "$OS" = Windows_NT ] && echo ON || echo OFF` \
 	-Dlibyaml_INCLUDE_DIR=${DEPSDIR}/include/ \
 	-Dlibyaml_LIBRARY=${DEPSDIR}/lib/libyaml.a \
-	-Dlibelf_INCLUDE_DIR=${DEPSDIR}/include \
+	-Dlibelf_INCLUDE_DIR=${DEPSDIR}/include/libelf \
 	-Dlibelf_LIBRARY=${DEPSDIR}/lib/libelf.a \
 	-Dzlib_INCLUDE_DIR=${DEPSDIR}/include/ \
 	-Dzlib_LIBRARY=${DEPSDIR}/lib/libz.a \
