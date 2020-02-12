@@ -1,4 +1,4 @@
-DolceSDK Toolchain
+DolceSDK Toolchain [![Build Status](https://travis-ci.org/DolceSDK/toolchain.svg?branch=master)](https://travis-ci.org/DolceSDK/toolchain)
 ==============
 These are a set of tools that, along with an ARM compiler and linker, provides a
 build system for PlayStation Vita(TM). Look at

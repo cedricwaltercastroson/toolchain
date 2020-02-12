@@ -1,16 +1,8 @@
-matrix:
-  include:
-    - os: linux
-      dist: trusty
-      sudo: false
-    - os: osx
-      osx_image: xcode8.2
 language: c
-
+os:
+  - linux
+  - osx
+dist: bionic
+osx_image: xcode11.3
 script:
-  - chmod +x build.sh
-  - ./build.sh
-
-notifications:
-  irc:
-    - $IRC_CHANNEL
+  - "bash ./build.sh"
