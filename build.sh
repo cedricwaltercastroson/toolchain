@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -eu
 
@@ -8,7 +8,7 @@ DEPSDIR=$PWD/builds/deps_build
 JOBS=-j`getconf _NPROCESSORS_ONLN || sysctl kern.smp.cpus | sed 's/kern.smp.cpus: //'` || true
 
 echo "[Step 0.0] Clone buildscripts..."
-git clone https://github.com/vitasdk/buildscripts
+git clone https://github.com/DolceSDK/buildscripts
 
 echo "[Step 1.0] Prepare buildscripts..."
 mkdir -p ${BUILDDIR}
@@ -27,9 +27,21 @@ cmake --build . --target libelf_build -- ${JOBS}
 echo "[Step 1.4] Build libyaml..."
 cmake --build . --target libyaml_build -- ${JOBS}
 
-echo "[Step 2.0] Build vita-toolchain..."
+echo "[Step 2.0] Build DolceSDK toolchain..."
 cd ${CWD}
 mkdir build
 cd build
-cmake -G"Unix Makefiles" -DCMAKE_C_FLAGS_RELEASE:STRING="-O3 -DNDEBUG -DZIP_STATIC" -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=`[ "$OS" = Windows_NT ] && echo ON || echo OFF` -Dlibyaml_INCLUDE_DIRS=${DEPSDIR}/include/ -Dlibyaml_LIBRARY=${DEPSDIR}/lib/libyaml.a -Dlibelf_INCLUDE_DIR=${DEPSDIR}/include -Dlibelf_LIBRARY=${DEPSDIR}/lib/libelf.a -Dzlib_INCLUDE_DIR=${DEPSDIR}/include/ -Dzlib_LIBRARY=${DEPSDIR}/lib/libz.a -Dlibzip_INCLUDE_DIR=${DEPSDIR}/include/ -Dlibzip_CONFIG_INCLUDE_DIR=${DEPSDIR}/lib/libzip/include -Dlibzip_LIBRARY=${DEPSDIR}/lib/libzip.a  ../
+cmake -G"Unix Makefiles" \
+	-DCMAKE_C_FLAGS_RELEASE:STRING="-O3 -DNDEBUG -DZIP_STATIC" \
+	-DCMAKE_BUILD_TYPE=Release \
+	-DBUILD_SHARED_LIBS=`[ "$OS" = Windows_NT ] && echo ON || echo OFF` \
+	-Dlibyaml_INCLUDE_DIR=${DEPSDIR}/include/ \
+	-Dlibyaml_LIBRARY=${DEPSDIR}/lib/libyaml.a \
+	-Dlibelf_INCLUDE_DIR=${DEPSDIR}/include \
+	-Dlibelf_LIBRARY=${DEPSDIR}/lib/libelf.a \
+	-Dzlib_INCLUDE_DIR=${DEPSDIR}/include/ \
+	-Dzlib_LIBRARY=${DEPSDIR}/lib/libz.a \
+	-Dlibzip_INCLUDE_DIR=${DEPSDIR}/include/ \
+	-Dlibzip_CONFIG_INCLUDE_DIR=${DEPSDIR}/lib/libzip/include \
+	-Dlibzip_LIBRARY=${DEPSDIR}/lib/libzip.a  ../
 cmake --build . -- ${JOBS}
