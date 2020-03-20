@@ -112,6 +112,7 @@ endfunction(dolce_create_self)
 ##
 ## Generate stub libraries from a Sony ELF and config file
 ##   dolce_create_stubs(target-dir source config
+##                     LIB lib1 [lib2 ...]
 ##                     [KERNEL])
 ##
 ## @param target-dir
@@ -121,6 +122,8 @@ endfunction(dolce_create_self)
 ##   The ARM EABI ELF target (from add_executable for example)
 ## @param config
 ##   Path to a YAML config file defining exports
+## @param LIB
+##   Stub libraries to create targets for. This argument can be given multiple times.
 ## @param[opt] KERNEL
 ##   Specifies that this module makes kernel exports
 ##
@@ -129,7 +132,8 @@ function(dolce_create_stubs target-dir source config)
   set(DOLCE_LIBS_GEN_FLAGS "${DOLCE_LIBS_GEN_FLAGS}" CACHE STRING "dolce-libs-gen flags")
 
   set(options KERNEL)
-  cmake_parse_arguments(dolce_create_stubs "${options}" "" "" ${ARGN})
+  set(multiValueArgs LIB)
+  cmake_parse_arguments(dolce_create_stubs "${options}" "" "${multiValueArgs}" ${ARGN})
 
   if(dolce_create_stubs_KERNEL)
     set(kind kernel)
@@ -155,9 +159,13 @@ function(dolce_create_stubs target-dir source config)
     COMMENT "Generating imports YAML for ${sourcefile}"
   )
 
+  foreach(lib ${dolce_create_stubs_LIB})
+    set(libs ${libs} ${CMAKE_CURRENT_BINARY_DIR}/${target-dir}/lib${lib}.a)
+  endforeach()
+
   ## LIBS GEN command
   separate_arguments(DOLCE_LIBS_GEN_FLAGS)
-  add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${target-dir}
+  add_custom_command(OUTPUT ${libs}
     COMMAND ${DOLCE_LIBS_GEN} ${DOLCE_LIBS_GEN_FLAGS} ${CMAKE_CURRENT_BINARY_DIR}/${target-dir}.yml ${CMAKE_CURRENT_BINARY_DIR}/${target-dir}
     COMMAND make -C ${CMAKE_CURRENT_BINARY_DIR}/${target-dir}
     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${target-dir}.yml
@@ -167,11 +175,20 @@ function(dolce_create_stubs target-dir source config)
   ## LIBS GEN target
   add_custom_target(${target-dir}.target
     ALL
-    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${target-dir}
+    DEPENDS ${libs}
   )
   if(TARGET ${source})
     add_dependencies(${target-dir}.target ${source})
   endif()
+
+  ## stub lib targets
+  foreach(lib ${dolce_create_stubs_LIB})
+    add_library(${lib} STATIC IMPORTED GLOBAL)
+    add_dependencies(${lib} ${target-dir}.target)
+    set_target_properties(${lib} PROPERTIES
+      IMPORTED_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/${target-dir}/lib${lib}.a
+    )
+  endforeach()
 endfunction(dolce_create_stubs)
 ##################################################
 
