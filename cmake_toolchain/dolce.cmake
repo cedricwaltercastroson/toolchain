@@ -155,17 +155,22 @@ macro(dolce_create_stubs target-dir source config)
     COMMENT "Generating imports YAML for ${sourcefile}"
   )
 
-  ## ELF EXPORT target
+  ## LIBS GEN command
   separate_arguments(DOLCE_LIBS_GEN_FLAGS)
-  add_custom_target(${target-dir}
-    ALL
+  add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${target-dir}
     COMMAND ${DOLCE_LIBS_GEN} ${DOLCE_LIBS_GEN_FLAGS} ${CMAKE_CURRENT_BINARY_DIR}/${target-dir}.yml ${CMAKE_CURRENT_BINARY_DIR}/${target-dir}
     COMMAND make -C ${CMAKE_CURRENT_BINARY_DIR}/${target-dir}
     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${target-dir}.yml
     COMMENT "Building stubs ${target-dir}"
   )
+
+  ## LIBS GEN target
+  add_custom_target(${target-dir}.target
+    ALL
+    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${target-dir}
+  )
   if(TARGET ${source})
-    add_dependencies(${target-dir} ${source})
+    add_dependencies(${target-dir}.target ${source})
   endif()
 endmacro(dolce_create_stubs)
 ##################################################
