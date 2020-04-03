@@ -84,7 +84,7 @@ function(dolce_create_self target source)
   separate_arguments(DOLCE_ELF_CREATE_FLAGS)
   add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${sourcefile}.velf
     COMMAND ${DOLCE_ELF_CREATE} ${DOLCE_ELF_CREATE_FLAGS} ${sourcepath} ${CMAKE_CURRENT_BINARY_DIR}/${sourcefile}.velf
-    DEPENDS ${sourcepath}
+    DEPENDS ${sourcepath} ${fconfig}
     COMMENT "Converting to Sony ELF ${sourcefile}.velf" VERBATIM
   )
 
