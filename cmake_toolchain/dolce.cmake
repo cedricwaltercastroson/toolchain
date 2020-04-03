@@ -1,4 +1,4 @@
-## DolceSDK Toolchain CMake macros
+## DolceSDK Toolchain CMake functions
 ## Copyright (C) 2020 浅倉麗子
 ##
 ## This program is free software: you can redistribute it and/or modify
@@ -33,7 +33,7 @@ set(__DOLCE_CMAKE_INCLUDED__ TRUE)
 include(CMakeParseArguments)
 
 ##################################################
-## MACRO: dolce_create_self
+## FUNCTION: dolce_create_self
 ##
 ## Generate a SELF from an ARM EABI ELF
 ##   dolce_create_self(target source
@@ -53,7 +53,7 @@ include(CMakeParseArguments)
 ## @param[opt] CONFIG file
 ##   Path to a YAML config file defining exports and other optional information
 ##
-macro(dolce_create_self target source)
+function(dolce_create_self target source)
   set(DOLCE_ELF_CREATE_FLAGS "${DOLCE_ELF_CREATE_FLAGS}" CACHE STRING "dolce-elf-create flags")
   set(DOLCE_MAKE_FSELF_FLAGS "${DOLCE_MAKE_FSELF_FLAGS}" CACHE STRING "dolce-make-fself flags")
 
@@ -104,11 +104,11 @@ macro(dolce_create_self target source)
   if(TARGET ${source})
     add_dependencies(${target}.target ${source})
   endif()
-endmacro(dolce_create_self)
+endfunction(dolce_create_self)
 ##################################################
 
 ##################################################
-## MACRO: dolce_create_stubs
+## FUNCTION: dolce_create_stubs
 ##
 ## Generate stub libraries from a Sony ELF and config file
 ##   dolce_create_stubs(target-dir source config
@@ -124,7 +124,7 @@ endmacro(dolce_create_self)
 ## @param[opt] KERNEL
 ##   Specifies that this module makes kernel exports
 ##
-macro(dolce_create_stubs target-dir source config)
+function(dolce_create_stubs target-dir source config)
   set(DOLCE_ELF_EXPORT_FLAGS "${DOLCE_ELF_EXPORT_FLAGS}" CACHE STRING "dolce-elf-export flags")
   set(DOLCE_LIBS_GEN_FLAGS "${DOLCE_LIBS_GEN_FLAGS}" CACHE STRING "dolce-libs-gen flags")
 
@@ -172,11 +172,11 @@ macro(dolce_create_stubs target-dir source config)
   if(TARGET ${source})
     add_dependencies(${target-dir}.target ${source})
   endif()
-endmacro(dolce_create_stubs)
+endfunction(dolce_create_stubs)
 ##################################################
 
 ##################################################
-## MACRO: dolce_create_vpk
+## FUNCTION: dolce_create_vpk
 ##
 ## Creates a homebrew VPK from a SELF
 ##   dolce_create_vpk(target titleid eboot
@@ -200,7 +200,7 @@ endmacro(dolce_create_stubs)
 ##   Add an additional file at path to dest in the vpk (there can be multiple
 ##   of this parameter).
 ##
-macro(dolce_create_vpk target titleid eboot)
+function(dolce_create_vpk target titleid eboot)
   set(DOLCE_MKSFOEX_FLAGS "${DOLCE_MKSFOEX_FLAGS}" CACHE STRING "dolce-mksfoex flags")
   set(DOLCE_PACK_VPK_FLAGS "${DOLCE_PACK_VPK_FLAGS}" CACHE STRING "dolce-pack-vpk flags")
 
@@ -264,5 +264,5 @@ macro(dolce_create_vpk target titleid eboot)
   if(TARGET ${eboot})
     add_dependencies(${target}.target ${eboot})
   endif()
-endmacro(dolce_create_vpk)
+endfunction(dolce_create_vpk)
 ##################################################
