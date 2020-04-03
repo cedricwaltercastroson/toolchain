@@ -283,3 +283,56 @@ function(dolce_create_vpk target titleid eboot)
   endif()
 endfunction(dolce_create_vpk)
 ##################################################
+
+##################################################
+## FUNCTION: dolce_gen_libs
+##
+## Generate stub libraries from a NID database
+##   dolce_create_stubs(target-dir source
+##                     LIB lib1 [lib2 ...])
+##
+## @param target-dir
+##   Name for a directory containing generated stub libraries
+## @param source
+##   Path to a NID database YAML file
+## @param LIB
+##   Stub libraries to create targets for. This argument can be given multiple times.
+##
+function(dolce_gen_libs target-dir source)
+  set(DOLCE_LIBS_GEN_FLAGS "${DOLCE_LIBS_GEN_FLAGS}" CACHE STRING "dolce-libs-gen flags")
+
+  set(multiValueArgs LIB)
+  cmake_parse_arguments(dolce_gen_libs "" "" "${multiValueArgs}" ${ARGN})
+
+  get_filename_component(fsource ${source} ABSOLUTE)
+  get_filename_component(sourcefile ${fsource} NAME)
+
+  foreach(lib ${dolce_gen_libs_LIB})
+    set(libs ${libs} ${CMAKE_CURRENT_BINARY_DIR}/${target-dir}/lib${lib}.a)
+  endforeach()
+
+  ## LIBS GEN command
+  separate_arguments(DOLCE_LIBS_GEN_FLAGS)
+  add_custom_command(OUTPUT ${libs}
+    COMMAND ${DOLCE_LIBS_GEN} ${DOLCE_LIBS_GEN_FLAGS} ${fsource} ${CMAKE_CURRENT_BINARY_DIR}/${target-dir}
+    COMMAND make -C ${CMAKE_CURRENT_BINARY_DIR}/${target-dir}
+    DEPENDS ${fsource}
+    COMMENT "Generating libraries for ${sourcefile}"
+  )
+
+  ## LIBS GEN target
+  add_custom_target(${target-dir}.target
+    ALL
+    DEPENDS ${libs}
+  )
+
+  ## stub lib targets
+  foreach(lib ${dolce_gen_libs_LIB})
+    add_library(${lib} STATIC IMPORTED GLOBAL)
+    add_dependencies(${lib} ${target-dir}.target)
+    set_target_properties(${lib} PROPERTIES
+      IMPORTED_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/${target-dir}/lib${lib}.a
+    )
+  endforeach()
+endfunction(dolce_gen_libs)
+##################################################
