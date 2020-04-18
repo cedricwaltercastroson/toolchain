@@ -523,6 +523,8 @@ void *sce_elf_module_info_encode(
 	CONVERTOFFSET(module_info, extab_end);
 	module_info_raw->process_param_size = 0x34;
 	memcpy(&module_info_raw->process_param_magic, "PSP2", 4);
+	module_info_raw->process_param_unk_8 = 6;
+	module_info_raw->process_param_sdk_version = 0x03570011;
 
 	for (export = module_info->export_top; export < module_info->export_end; export++) {
 		int num_syms;

@@ -43,7 +43,9 @@ typedef struct SCE_TYPE(sce_module_info) {
 	// i decided to include process param into module_info (xyz)
 	uint32_t process_param_size;
 	uint32_t process_param_magic;
-	uint32_t process_param_unk[11];
+	uint32_t process_param_unk_8;
+	uint32_t process_param_sdk_version;
+	uint32_t process_param_unk_10[9];
 } SCE_TYPE(sce_module_info);
 
 typedef struct SCE_TYPE(sce_module_exports) {
