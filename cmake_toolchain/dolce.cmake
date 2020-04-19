@@ -52,18 +52,24 @@ include(CMakeParseArguments)
 ##   The homebrew uses private/system APIs and requires extended permissions
 ## @param[opt] CONFIG file
 ##   Path to a YAML config file defining exports and other optional information
+## @param[opt] BOOT_PARAM file
+##   Path to a binary file specifying the boot param section of the SELF
 ##
 function(dolce_create_self target source)
   set(DOLCE_ELF_CREATE_FLAGS "${DOLCE_ELF_CREATE_FLAGS}" CACHE STRING "dolce-elf-create flags")
   set(DOLCE_MAKE_FSELF_FLAGS "${DOLCE_MAKE_FSELF_FLAGS}" CACHE STRING "dolce-make-fself flags")
 
   set(options UNCOMPRESSED UNSAFE)
-  set(oneValueArgs CONFIG)
+  set(oneValueArgs CONFIG BOOT_PARAM)
   cmake_parse_arguments(dolce_create_self "${options}" "${oneValueArgs}" "" ${ARGN})
 
   if(dolce_create_self_CONFIG)
     get_filename_component(fconfig ${dolce_create_self_CONFIG} ABSOLUTE)
     set(DOLCE_ELF_CREATE_FLAGS "${DOLCE_ELF_CREATE_FLAGS} -e ${fconfig}")
+  endif()
+  if(dolce_create_self_BOOT_PARAM)
+    get_filename_component(fbootparam ${dolce_create_self_BOOT_PARAM} ABSOLUTE)
+    set(DOLCE_MAKE_FSELF_FLAGS "${DOLCE_MAKE_FSELF_FLAGS} -bp ${fbootparam}")
   endif()
   if(NOT dolce_create_self_UNCOMPRESSED)
     set(DOLCE_MAKE_FSELF_FLAGS "${DOLCE_MAKE_FSELF_FLAGS} -c")
@@ -92,7 +98,7 @@ function(dolce_create_self target source)
   separate_arguments(DOLCE_MAKE_FSELF_FLAGS)
   add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${target}
     COMMAND ${DOLCE_MAKE_FSELF} ${DOLCE_MAKE_FSELF_FLAGS} ${CMAKE_CURRENT_BINARY_DIR}/${sourcefile}.velf ${CMAKE_CURRENT_BINARY_DIR}/${target}
-    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${sourcefile}.velf
+    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${sourcefile}.velf ${fbootparam}
     COMMENT "Creating SELF ${target}"
   )
 
