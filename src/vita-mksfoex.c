@@ -3,7 +3,7 @@
 #  ____|   |	____|   |		| |____|
 # |	 ___|   |	 ___|	____| |	\	PSPDEV Open Source Project.
 #-----------------------------------------------------------------------
-# Review pspsdk README & LICENSE files for further details.
+# See LICENSE/pspsdk for further details.
 #
 # New and improved mksfo
 # $Id$
