@@ -2,28 +2,28 @@
 
 #include <inttypes.h>
 
-// some info taken from the wiki, see http://vitadevwiki.com/index.php?title=SELF_File_Format
+// some info taken from the wiki, see https://www.psdevwiki.com/ps3/SELF_-_SPRX
 
 #pragma pack(push, 1)
 typedef struct {
-	uint32_t magic;                 /* 53434500 = SCE\0 */
-	uint32_t version;               /* header version 3*/
-	uint16_t sdk_type;              /* */
-	uint16_t header_type;           /* 1 self, 2 unknown, 3 pkg */
-	uint32_t metadata_offset;       /* metadata offset */
-	uint64_t header_len;            /* self header length */
-	uint64_t elf_filesize;          /* ELF file length */
-	uint64_t self_filesize;         /* SELF file length */
-	uint64_t unknown;               /* UNKNOWN */
-	uint64_t self_offset;           /* SELF offset */
-	uint64_t appinfo_offset;        /* app info offset */
-	uint64_t elf_offset;            /* ELF #1 offset */
-	uint64_t phdr_offset;           /* program header offset */
-	uint64_t shdr_offset;           /* section header offset */
-	uint64_t section_info_offset;   /* section info offset */
-	uint64_t sceversion_offset;     /* version offset */
-	uint64_t controlinfo_offset;    /* control info offset */
-	uint64_t controlinfo_size;      /* control info size */
+	uint32_t magic;                      /* 53434500 = SCE\0 */
+	uint32_t version;                    /* header version 3*/
+	uint16_t sdk_type;                   /* */
+	uint16_t header_type;                /* 1 self, 2 unknown, 3 pkg */
+	uint32_t metadata_offset;            /* metadata offset */
+	uint64_t header_len;                 /* self header length */
+	uint64_t elf_filesize;               /* ELF file length */
+	uint64_t self_filesize;              /* SELF file length */
+	uint64_t unknown;                    /* UNKNOWN */
+	uint64_t self_offset;                /* SELF offset */
+	uint64_t appinfo_offset;             /* app info offset */
+	uint64_t elf_offset;                 /* ELF #1 offset */
+	uint64_t phdr_offset;                /* program header offset */
+	uint64_t shdr_offset;                /* section header offset */
+	uint64_t section_info_offset;        /* section info offset */
+	uint64_t sceversion_offset;          /* version offset */
+	uint64_t supplemental_hdr_offset;    /* supplemental header offset */
+	uint64_t supplemental_hdr_size;      /* supplemental header size */
 	uint64_t padding;
 } SCE_header;
 
@@ -43,27 +43,26 @@ typedef struct {
 } SCE_version;
 
 typedef struct {
-	uint32_t type;
+	uint32_t type; // 5 - npdrm_hdr, 6 - boot_param_hdr, 7 - shared_secret_hdr
 	uint32_t size;
-	uint32_t unk;
+	uint32_t next; // 1 if another Supplemental Header element follows else 0
 	uint32_t pad;
-} SCE_controlinfo;
+} SCE_supplemental_hdr;
 
 typedef struct {
-	SCE_controlinfo common;
+	SCE_supplemental_hdr common;
 	char unk[0x100];
-} SCE_controlinfo_5;
+} SCE_npdrm_hdr;
 
 typedef struct {
-	SCE_controlinfo common;
-	uint32_t unk1;
-	char unk2[0xFC];
-} SCE_controlinfo_6;
+	SCE_supplemental_hdr common;
+	uint32_t unk[0x40];
+} SCE_boot_param_hdr;
 
 typedef struct {
-	SCE_controlinfo common;
+	SCE_supplemental_hdr common;
 	char unk[0x40];
-} SCE_controlinfo_7;
+} SCE_shared_secret_hdr;
 
 typedef struct {
 	uint64_t offset;

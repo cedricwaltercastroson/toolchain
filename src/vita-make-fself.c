@@ -115,8 +115,8 @@ int main(int argc, const char **argv) {
 	// hdr.shdr_offset = ;
 	hdr.section_info_offset = hdr.phdr_offset + sizeof(Elf32_Phdr) * ehdr->e_phnum;
 	hdr.sceversion_offset = hdr.section_info_offset + sizeof(segment_info) * ehdr->e_phnum;
-	hdr.controlinfo_offset = hdr.sceversion_offset + sizeof(SCE_version);
-	hdr.controlinfo_size = sizeof(SCE_controlinfo_5) + sizeof(SCE_controlinfo_6) + sizeof(SCE_controlinfo_7);
+	hdr.supplemental_hdr_offset = hdr.sceversion_offset + sizeof(SCE_version);
+	hdr.supplemental_hdr_size = sizeof(SCE_npdrm_hdr) + sizeof(SCE_boot_param_hdr) + sizeof(SCE_shared_secret_hdr);
 	hdr.self_filesize = 0;
 
 	uint32_t offset_to_real_elf = HEADER_LEN;
@@ -143,18 +143,21 @@ int main(int argc, const char **argv) {
 	ver.unk3 = 16;
 	ver.unk4 = 0;
 
-	SCE_controlinfo_5 control_5 = { 0 };
-	control_5.common.type = 5;
-	control_5.common.size = sizeof(control_5);
-	control_5.common.unk = 1;
-	SCE_controlinfo_6 control_6 = { 0 };
-	control_6.common.type = 6;
-	control_6.common.size = sizeof(control_6);
-	control_6.common.unk = 1;
-	control_6.unk1 = 1;
-	SCE_controlinfo_7 control_7 = { 0 };
-	control_7.common.type = 7;
-	control_7.common.size = sizeof(control_7);
+	SCE_npdrm_hdr npdrm_hdr = { 0 };
+	npdrm_hdr.common.type = 5;
+	npdrm_hdr.common.size = sizeof(npdrm_hdr);
+	npdrm_hdr.common.next = 1;
+
+	SCE_boot_param_hdr boot_param_hdr = { 0 };
+	boot_param_hdr.common.type = 6;
+	boot_param_hdr.common.size = sizeof(boot_param_hdr);
+	boot_param_hdr.common.next = 1;
+	boot_param_hdr.unk[0] = 1;
+
+	SCE_shared_secret_hdr shared_secret_hdr = { 0 };
+	shared_secret_hdr.common.type = 7;
+	shared_secret_hdr.common.size = sizeof(shared_secret_hdr);
+	shared_secret_hdr.common.next = 0;
 
 	Elf32_Ehdr myhdr = { 0 };
 	memcpy(myhdr.e_ident, "\177ELF\1\1\1", 8);
@@ -218,10 +221,10 @@ int main(int argc, const char **argv) {
 		goto error;
 	}
 
-	fseek(fout, hdr.controlinfo_offset, SEEK_SET);
-	fwrite(&control_5, sizeof(control_5), 1, fout);
-	fwrite(&control_6, sizeof(control_6), 1, fout);
-	fwrite(&control_7, sizeof(control_7), 1, fout);
+	fseek(fout, hdr.supplemental_hdr_offset, SEEK_SET);
+	fwrite(&npdrm_hdr, sizeof(npdrm_hdr), 1, fout);
+	fwrite(&boot_param_hdr, sizeof(boot_param_hdr), 1, fout);
+	fwrite(&shared_secret_hdr, sizeof(shared_secret_hdr), 1, fout);
 
 	if (!compressed) {
 		fseek(fout, HEADER_LEN, SEEK_SET);
