@@ -33,6 +33,8 @@ int main(int argc, const char **argv) {
 	int safe = 0;
 	int compressed = 0;
 	uint64_t authid = 0;
+	const char *boot_param_path = NULL;
+
 	while (argc > 2) {
 		if (strcmp(*argv, "-s") == 0) {
 			safe = 2;
@@ -43,13 +45,20 @@ int main(int argc, const char **argv) {
 		} else if (strcmp(*argv, "-a") == 0) {
 			argc--;
 			argv++;
-			
-			if (argc > 2)
+			if (argc >= 3) {
 				authid = strtoull(*argv, NULL, 0);
+			}
+		} else if (strcmp(*argv, "-bp") == 0) {
+			argc--;
+			argv++;
+			if (argc >= 3) {
+				boot_param_path = *argv;
+			}
 		}
 		argc--;
 		argv++;
 	}
+
 	input_path = argv[0];
 	output_path = argv[1];
 
@@ -153,6 +162,19 @@ int main(int argc, const char **argv) {
 	boot_param_hdr.common.size = sizeof(boot_param_hdr);
 	boot_param_hdr.common.next = 1;
 	boot_param_hdr.unk[0] = 1;
+	if (boot_param_path) {
+		FILE *fbp = fopen(boot_param_path, "rb");
+		if (!fbp) {
+			perror("Failed to open boot param file");
+			goto error;
+		}
+		size_t sz = fread(&boot_param_hdr.unk, sizeof(boot_param_hdr.unk), 1, fbp);
+		fclose(fbp);
+		if (sz != 1) {
+			perror("Boot param file ended prematurely");
+			goto error;
+		}
+	}
 
 	SCE_shared_secret_hdr shared_secret_hdr = { 0 };
 	shared_secret_hdr.common.type = 7;
