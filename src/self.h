@@ -3,6 +3,7 @@
 #include <inttypes.h>
 
 // some info taken from the wiki, see https://www.psdevwiki.com/ps3/SELF_-_SPRX
+// For more information on boot params, see https://forum.devchroma.nl/index.php/topic,141.0.html
 
 #pragma pack(push, 1)
 typedef struct {
@@ -56,7 +57,15 @@ typedef struct {
 
 typedef struct {
 	SCE_supplemental_hdr common;
-	uint32_t unk[0x40];
+	uint32_t is_used;                  // always 1
+	uint32_t attribute;
+	uint32_t phy_memsize;              // in kilobytes
+	uint32_t app_memsize;              // in kilobytes
+	uint32_t file_open_max_num;
+	uint32_t directory_max_level;
+	uint32_t encrypt_mount_max_num;
+	uint32_t redirect_mount_max_num;
+	uint32_t reserved[0x38];
 } SCE_boot_param_hdr;
 
 typedef struct {

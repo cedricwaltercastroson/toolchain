@@ -161,15 +161,18 @@ int main(int argc, const char **argv) {
 	boot_param_hdr.common.type = 6;
 	boot_param_hdr.common.size = sizeof(boot_param_hdr);
 	boot_param_hdr.common.next = 1;
-	boot_param_hdr.unk[0] = 1;
+	boot_param_hdr.is_used = 1;
 	if (boot_param_path) {
 		FILE *fbp = fopen(boot_param_path, "rb");
 		if (!fbp) {
 			perror("Failed to open boot param file");
 			goto error;
 		}
-		size_t sz = fread(&boot_param_hdr.unk, sizeof(boot_param_hdr.unk), 1, fbp);
+
+		size_t sz = fread(&boot_param_hdr.is_used,
+			sizeof(boot_param_hdr) - sizeof(boot_param_hdr.common), 1, fbp);
 		fclose(fbp);
+
 		if (sz != 1) {
 			perror("Boot param file ended prematurely");
 			goto error;
