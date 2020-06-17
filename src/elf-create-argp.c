@@ -10,8 +10,9 @@ int parse_arguments(int argc, char *argv[], elf_create_args *arguments)
 
 	arguments->log_level = 0;
 	arguments->check_stub_count = 1;
+	arguments->heap_size = -1;
 
-	while ((c = getopt(argc, argv, "vne:")) != -1)
+	while ((c = getopt(argc, argv, "vne:h:")) != -1)
 	{
 		switch (c)
 		{
@@ -23,6 +24,9 @@ int parse_arguments(int argc, char *argv[], elf_create_args *arguments)
 			break;
 		case 'n':
 			arguments->check_stub_count = 0;
+			break;
+		case 'h':
+			arguments->heap_size = strtol(optarg, NULL, 0);
 			break;
 		case '?':
 			fprintf(stderr, "unknown option -%c\n", optopt);

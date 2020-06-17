@@ -127,6 +127,7 @@ static int usage(int argc, char *argv[])
 					"\t-v,-vv,-vvv:    logging verbosity (more v is more verbose)\n"
 					"\t-n         :    allow empty imports\n"
 					"\t-e yml     :    optional config options\n"
+					"\t-h size    :    SceLibc heap size in bytes\n"
 					"\tinput.elf  :    input ARM ET_EXEC type ELF\n"
 					"\toutput.velf:    output ET_SCE_RELEXEC type ELF\n", argc > 0 ? argv[0] : "dolce-elf-create");
 	return 0;
@@ -209,7 +210,7 @@ int main(int argc, char *argv[])
 	PRINTSEC(sceVStub_rodata);
 
 	encoded_modinfo = sce_elf_module_info_encode(
-			module_info, ve, &section_sizes, &rtable);
+			module_info, ve, &section_sizes, &rtable, args.heap_size);
 
 	TRACEF(VERBOSE, "Relocations from encoded modinfo:\n");
 	print_rtable(&rtable);

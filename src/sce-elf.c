@@ -459,7 +459,7 @@ void sce_elf_module_info_free(sce_module_info_t *module_info)
 } while(0)
 void *sce_elf_module_info_encode(
 		const sce_module_info_t *module_info, const vita_elf_t *ve, const sce_section_sizes_t *sizes,
-		vita_elf_rela_table_t *rtable)
+		vita_elf_rela_table_t *rtable, int heap_size)
 {
 	void *data;
 	sce_section_sizes_t cur_sizes = {0};
@@ -538,6 +538,12 @@ void *sce_elf_module_info_encode(
 	ADDRELA(&module_info_raw->libc_param_heap_size_default);
 
 	module_info_raw->_libc_param_heap_size_default = 0x40000;
+
+	if (heap_size >= 0) {
+		module_info_raw->_libc_param_heap_size = heap_size;
+		module_info_raw->libc_param_heap_size = htole32(segment_base + start_offset + offsetof(sce_module_info_raw, _libc_param_heap_size));
+		ADDRELA(&module_info_raw->libc_param_heap_size);
+	}
 
 	for (export = module_info->export_top; export < module_info->export_end; export++) {
 		int num_syms;

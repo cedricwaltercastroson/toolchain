@@ -89,7 +89,7 @@ void sce_elf_module_info_free(sce_module_info_t *module_info);
 
 void *sce_elf_module_info_encode(
 		const sce_module_info_t *module_info, const vita_elf_t *ve, const sce_section_sizes_t *sizes,
-		vita_elf_rela_table_t *rtable);
+		vita_elf_rela_table_t *rtable, int heap_size);
 
 int sce_elf_write_module_info(
 		Elf *dest, const vita_elf_t *ve, const sce_section_sizes_t *sizes, void *module_info);
