@@ -57,6 +57,25 @@ typedef struct SCE_TYPE(sce_module_info) {
 	SCE_PTR(const void *) process_param_libc_param;
 	uint32_t              process_param_unk_30;
 
+	// TODO: separate into another struct
+	uint32_t              libc_param_size;                      /* 0x38 */
+	uint32_t              libc_param_unk_4;
+	SCE_PTR(uint32_t *)   libc_param_heap_size;
+	SCE_PTR(uint32_t *)   libc_param_heap_size_default;
+	uint32_t              libc_param_unk_10;
+	uint32_t              libc_param_unk_14;
+	uint32_t              libc_param_sdk_version;
+	uint32_t              libc_param_unk_1c;                    /* 9 */
+	SCE_PTR(const void *) libc_param_malloc_replace;
+	SCE_PTR(const void *) libc_param_new_replace;
+	uint32_t              libc_param_unk_28;
+	uint32_t              libc_param_unk_2c;
+	uint32_t              libc_param_unk_30;
+	SCE_PTR(const void *) libc_param_malloc_replace_for_tls;
+
+	uint32_t              _libc_param_heap_size;
+	uint32_t              _libc_param_heap_size_default;        /* 0x40000 */
+
 } SCE_TYPE(sce_module_info);
 
 typedef struct SCE_TYPE(sce_module_exports) {

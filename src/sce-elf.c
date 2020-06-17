@@ -526,6 +526,18 @@ void *sce_elf_module_info_encode(
 	memcpy(&module_info_raw->process_param_magic, "PSP2", 4);
 	module_info_raw->process_param_unk_8 = htole32(6);
 	module_info_raw->process_param_sdk_version = htole32(SCE_PSP2_SDK_VERSION);
+	module_info_raw->process_param_libc_param = htole32(segment_base + start_offset + offsetof(sce_module_info_raw, libc_param_size));
+
+	ADDRELA(&module_info_raw->process_param_libc_param);
+
+	module_info_raw->libc_param_size = htole32(0x38);
+	module_info_raw->libc_param_heap_size_default = htole32(segment_base + start_offset + offsetof(sce_module_info_raw, _libc_param_heap_size_default));
+	module_info_raw->libc_param_sdk_version = htole32(SCE_PSP2_SDK_VERSION);
+	module_info_raw->libc_param_unk_1c = htole32(9);
+
+	ADDRELA(&module_info_raw->libc_param_heap_size_default);
+
+	module_info_raw->_libc_param_heap_size_default = 0x40000;
 
 	for (export = module_info->export_top; export < module_info->export_end; export++) {
 		int num_syms;
