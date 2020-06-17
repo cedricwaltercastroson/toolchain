@@ -12,6 +12,8 @@
 
 #include <stdint.h>
 
+#define SCE_PSP2_SDK_VERSION 0x03570011
+
 struct SCE_TYPE(sce_module_exports);
 struct SCE_TYPE(sce_module_imports);
 
@@ -40,12 +42,21 @@ typedef struct SCE_TYPE(sce_module_info) {
 	SCE_PTR(const void *) extab_top;	/* Offset to start of ARM EXTAB (optional) */
 	SCE_PTR(const void *) extab_end;	/* Offset to end of ARM EXTAB (optional */
 
-	// i decided to include process param into module_info (xyz)
-	uint32_t process_param_size;
-	uint32_t process_param_magic;
-	uint32_t process_param_unk_8;
-	uint32_t process_param_sdk_version;
-	uint32_t process_param_unk_10[9];
+	// TODO: separate into another struct
+	uint32_t              process_param_size;                      /* 0x34 */
+	uint32_t              process_param_magic;                     /* "PSP2" */
+	uint32_t              process_param_unk_8;                     /* 6 */
+	uint32_t              process_param_sdk_version;
+	SCE_PTR(const char *) process_param_main_thread_name;
+	SCE_PTR(uint32_t *)   process_param_main_thread_priority;
+	SCE_PTR(uint32_t *)   process_param_main_thread_stack_size;
+	uint32_t              process_param_unk_1c;
+	SCE_PTR(const char *) process_param_process_name;
+	SCE_PTR(uint32_t *)   process_param_unk_24;
+	uint32_t              process_param_unk_28;
+	SCE_PTR(const void *) process_param_libc_param;
+	uint32_t              process_param_unk_30;
+
 } SCE_TYPE(sce_module_info);
 
 typedef struct SCE_TYPE(sce_module_exports) {
