@@ -15,6 +15,7 @@ usage: dolce-elf-create [-v|vv|vvv] [-n] [-e config.yml] input.elf output.velf
     -v,-vv,-vvv:    logging verbosity (more v is more verbose)
     -n         :    allow empty imports
     -e yml     :    optional config options
+    -h size    :    SceLibc heap size in bytes
     input.elf  :    input ARM ET_EXEC type ELF
     output.velf:    output ET_SCE_RELEXEC type ELF
 ```
@@ -47,16 +48,27 @@ generate a Sony ELF. After calling `dolce-libs-gen` you need to run `make` or
 
 ### dolce-make-fself
 ```
-usage: dolce-make-fself [-s|-ss] [-c] input.velf output-eboot.bin
+usage: dolce-make-fself [-s|-ss] [-c] [-bp bootparam.bin] input.velf output-eboot.bin
     -s : Generate a safe eboot.bin. A safe eboot.bin does not have access
     to restricted APIs and important parts of the filesystem.
     -ss: Generate a secret-safe eboot.bin. Do not use this option if you don't know what it does.
     -c : Enable compression.
+    -bp: Specify file to use as boot params.
 ```
 Generates a FSELF (the format expected of `eboot.bin` loaded by Vita) which
 wraps around the Sony ELF file. Optionally supports compression of the input
 ELF. Also allows marking a homebrew as "safe", which prevents it from harming
 the system.
+
+### dolce-make-bootparam
+```
+usage: dolce-make-bootparam [<name> <value>] ... <output>
+    where <name> is one of attribute, phy_memsize, app_memsize, file_open_max_num,
+    directory_max_level, encrypt_mount_max_num, redirect_mount_max_num
+```
+Generates a boot param file for use with `dolce-make-fself`. app_memsize must be
+set to run applications in system mode. app_memsize and phy_memsize are set in
+kilobytes and must be 2048 aligned.
 
 ### dolce-mksfoex
 ```
