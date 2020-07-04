@@ -118,7 +118,7 @@ endfunction(dolce_create_self)
 ##
 ## Generate stub libraries from a Sony ELF and config file
 ##   dolce_create_stubs(target-dir source config
-##                     LIB lib1 [lib2 ...]
+##                     [LIB lib1 [lib2 ...]]
 ##                     [KERNEL])
 ##
 ## @param target-dir
@@ -128,7 +128,7 @@ endfunction(dolce_create_self)
 ##   The ARM EABI ELF target (from add_executable for example)
 ## @param config
 ##   Path to a YAML config file defining exports
-## @param LIB
+## @param[opt] LIB
 ##   Stub libraries to create targets for. This argument can be given multiple times.
 ## @param[opt] KERNEL
 ##   Specifies that this module makes kernel exports
@@ -165,9 +165,13 @@ function(dolce_create_stubs target-dir source config)
     COMMENT "Generating imports YAML for ${sourcefile}"
   )
 
-  foreach(lib ${dolce_create_stubs_LIB})
-    set(libs ${libs} ${CMAKE_CURRENT_BINARY_DIR}/${target-dir}/lib${lib}.a)
-  endforeach()
+  if(dolce_create_stubs_LIB)
+    foreach(lib ${dolce_create_stubs_LIB})
+      set(libs ${libs} ${CMAKE_CURRENT_BINARY_DIR}/${target-dir}/lib${lib}.a)
+    endforeach()
+  else()
+    set(libs "${target-dir}")
+  endif()
 
   ## LIBS GEN command
   separate_arguments(DOLCE_LIBS_GEN_FLAGS)
@@ -295,13 +299,13 @@ endfunction(dolce_create_vpk)
 ##
 ## Generate stub libraries from a NID database
 ##   dolce_create_stubs(target-dir source
-##                     LIB lib1 [lib2 ...])
+##                     [LIB lib1 [lib2 ...]])
 ##
 ## @param target-dir
 ##   Name for a directory containing generated stub libraries
 ## @param source
 ##   Path to a NID database YAML file
-## @param LIB
+## @param[opt] LIB
 ##   Stub libraries to create targets for. This argument can be given multiple times.
 ##
 function(dolce_gen_libs target-dir source)
@@ -313,9 +317,13 @@ function(dolce_gen_libs target-dir source)
   get_filename_component(fsource ${source} ABSOLUTE)
   get_filename_component(sourcefile ${fsource} NAME)
 
-  foreach(lib ${dolce_gen_libs_LIB})
-    set(libs ${libs} ${CMAKE_CURRENT_BINARY_DIR}/${target-dir}/lib${lib}.a)
-  endforeach()
+  if(dolce_gen_libs_LIB)
+    foreach(lib ${dolce_gen_libs_LIB})
+      set(libs ${libs} ${CMAKE_CURRENT_BINARY_DIR}/${target-dir}/lib${lib}.a)
+    endforeach()
+  else()
+    set(libs "${target-dir}")
+  endif()
 
   ## LIBS GEN command
   separate_arguments(DOLCE_LIBS_GEN_FLAGS)
