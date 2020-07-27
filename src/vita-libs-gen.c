@@ -1,3 +1,30 @@
+/*
+This file is part of DolceSDK
+Copyright (C) 2020 Asakura Reiko
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, version 3 of the License.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+Copyright (C) 2015, 2016 xyzz
+Copyright (C) 2015, 2016 Yifan Lu
+Copyright (C) 2015 Glenn Anderson
+Copyright (C) 2016 frangarcj
+Copyright (C) 2016 xerpi
+Copyright (C) 2016 Davee
+Copyright (C) 2016 d3m3vilurr
+Copyright (C) 2016 soarqin
+See LICENSE/vitasdk
+*/
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -364,13 +391,10 @@ int generate_makefile(vita_imports_t **imports, int imports_count)
 	g_kernel_objs[0] = '\0';
 
 	fputs(
-		"ifdef DOLCESDK\n"
-		"PREFIX = $(DOLCESDK)/bin/\n"
-		"endif\n\n"
-		"ARCH ?= $(PREFIX)arm-dolce-eabi\n"
-		"AS = $(ARCH)-as\n"
-		"AR = $(ARCH)-ar\n"
-		"RANLIB = $(ARCH)-ranlib\n\n"
+		"ARCH ?= arm-dolce-eabi\n"
+		"AS = $(PREFIX)$(DOLCESDK)/bin/$(ARCH)-as\n"
+		"AR = $(PREFIX)$(DOLCESDK)/bin/$(ARCH)-ar\n"
+		"RANLIB = $(PREFIX)$(DOLCESDK)/bin/$(ARCH)-ranlib\n\n"
 		"TARGETS =", fp);
 
 	for (h = 0; h < imports_count; h++) {
@@ -485,8 +509,9 @@ int generate_makefile(vita_imports_t **imports, int imports_count)
 		"$(foreach library,$(TARGETS),$(eval $(call LIBRARY_template,$(library))))\n"
 		"$(foreach library,$(TARGETS_WEAK),$(eval $(call LIBRARY_WEAK_template,$(library))))\n\n"
 		"install: $(TARGETS) $(TARGETS_WEAK)\n"
-		"\tcp $(TARGETS) $(DOLCESDK)/arm-dolce-eabi/lib\n"
-		"\tcp $(TARGETS_WEAK) $(DOLCESDK)/arm-dolce-eabi/lib\n\n"
+		"\tmkdir -p $(DESTDIR)$(DOLCESDK)/$(ARCH)/lib\n"
+		"\tcp $(TARGETS) $(DESTDIR)$(DOLCESDK)/$(ARCH)/lib\n"
+		"\tcp $(TARGETS_WEAK) $(DESTDIR)$(DOLCESDK)/$(ARCH)/lib\n\n"
 		"clean:\n"
 		"\trm -f $(TARGETS) $(TARGETS_WEAK) $(ALL_OBJS)\n\n"
 		"$(TARGETS) $(TARGETS_WEAK):\n"
