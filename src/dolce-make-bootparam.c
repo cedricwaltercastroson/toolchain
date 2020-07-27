@@ -1,6 +1,6 @@
 /*
-DolceSDK
-Copyright (C) 2020 浅倉麗子
+This file is part of DolceSDK
+Copyright (C) 2020 Asakura Reiko
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
