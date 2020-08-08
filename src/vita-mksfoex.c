@@ -1,6 +1,7 @@
 /*
 This file is part of DolceSDK
 Copyright (C) 2020 Asakura Reiko
+Copyright (C) 2020 GrapheneCt
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -27,13 +28,14 @@ See LICENSE/pspsdk
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
+#include <time.h>
 #include "getopt.h"
 #include "types.h"
 
 #define PSF_MAGIC	0x46535000
 #define PSF_VERSION  0x00000101
 
-struct SfoHeader 
+struct SfoHeader
 {
 	uint32_t magic;
 	uint32_t version;
@@ -65,20 +67,24 @@ struct EntryContainer
 };
 
 struct EntryContainer g_defaults[] = {
-	{ "APP_VER", PSF_TYPE_STR, 0, "00.00" },
-	{ "ATTRIBUTE", PSF_TYPE_VAL, 0x8000, NULL },
+	{ "APP_VER", PSF_TYPE_STR, 8, "01.00" },
+	{ "ATTRIBUTE", PSF_TYPE_VAL, 0x8000, NULL }, // Disable communication zone
 	{ "ATTRIBUTE2", PSF_TYPE_VAL, 0, NULL },
 	{ "ATTRIBUTE_MINOR", PSF_TYPE_VAL, 0x10, NULL },
-	{ "CATEGORY", PSF_TYPE_STR, 0, "gd" },
-	{ "CONTENT_ID", PSF_TYPE_STR, 48, "" },
-	{ "LAREA_TYPE", PSF_TYPE_VAL, 0, NULL },
-	{ "PARENTAL_LEVEL", PSF_TYPE_VAL, 0, NULL },
-	{ "PSP2_DISP_VER", PSF_TYPE_STR, 0, "00.000" },
-	{ "PSP2_SYSTEM_VER", PSF_TYPE_VAL, 0, NULL },
+	{ "CATEGORY", PSF_TYPE_STR, 4, "gd" },
+	{ "CONTENT_ID", PSF_TYPE_STR, 48, "HB0000-ABCD99999_00-ABCD999990000000" },
+	{ "GC_RO_SIZE", PSF_TYPE_VAL, 0, NULL }, // Set app type to No VC/MC-MC
+	{ "GC_RW_SIZE", PSF_TYPE_VAL, 0, NULL }, // Set app type to No VC/MC-MC
+	{ "PARENTAL_LEVEL", PSF_TYPE_VAL, 1, NULL },
+	{ "PSP2_DISP_VER", PSF_TYPE_STR, 8, "03.570" },
+	{ "PSP2_SYSTEM_VER", PSF_TYPE_VAL, 0x03570000, NULL },
+	{ "PUBTOOLINFO", PSF_TYPE_STR, 512, "" },
+	{ "REGION_DENY", PSF_TYPE_VAL, 0, NULL },
+	{ "SAVEDATA_MAX_SIZE", PSF_TYPE_VAL, 0x100000, NULL }, // 1GiB, recommended by Sony as default
 	{ "STITLE", PSF_TYPE_STR, 52, "Homebrew" },
-	{ "TITLE", PSF_TYPE_STR, 0x80, "Homebrew" },
-	{ "TITLE_ID", PSF_TYPE_STR, 0, "ABCD99999" },
-	{ "VERSION", PSF_TYPE_STR, 0, "00.00" },
+	{ "TITLE", PSF_TYPE_STR, 128, "Homebrew" },
+	{ "TITLE_ID", PSF_TYPE_STR, 12, "ABCD99999" },
+	{ "VERSION", PSF_TYPE_STR, 8, "01.00" }, // master version
 };
 
 #define MAX_OPTIONS (256)
@@ -88,7 +94,7 @@ static const char *g_filename = NULL;
 static int g_empty = 0;
 static struct EntryContainer g_vals[MAX_OPTIONS];
 
-static struct option arg_opts[] = 
+static struct option arg_opts[] =
 {
 	{"dword", required_argument, NULL, 'd'},
 	{"string", required_argument, NULL, 's'},
@@ -139,7 +145,7 @@ int add_string(char *str)
 	}
 
 	*equals++ = 0;
-	
+
 	if ((entry = find_name(str)))
 	{
 		entry->data = equals;
@@ -147,7 +153,7 @@ int add_string(char *str)
 	else
 	{
 		entry = find_free();
-		if(entry == NULL)
+		if (entry == NULL)
 		{
 			fprintf(stderr, "Maximum options reached\n");
 			return 0;
@@ -158,7 +164,7 @@ int add_string(char *str)
 		entry->type = PSF_TYPE_STR;
 		entry->data = equals;
 	}
-	
+
 	return 1;
 }
 
@@ -192,7 +198,7 @@ int add_dword(char *str)
 		memset(entry, 0, sizeof(struct EntryContainer));
 		entry->name = str;
 		entry->type = PSF_TYPE_VAL;
-		entry->value = strtoul(equals, NULL, 0);		
+		entry->value = strtoul(equals, NULL, 0);
 	}
 
 	return 1;
@@ -266,7 +272,7 @@ int main(int argc, char **argv)
 	unsigned int align;
 	unsigned int keyofs;
 	unsigned int count;
-	
+
 	for(i = 0; i < (sizeof(g_defaults) / sizeof(struct EntryContainer)); i++)
 	{
 		struct EntryContainer *entry = find_free();
@@ -277,8 +283,8 @@ int main(int argc, char **argv)
 		}
 		*entry = g_defaults[i];
 	}
-	
-	if(!process_args(argc, argv)) 
+
+	if(!process_args(argc, argv))
 	{
 		fprintf(stderr, "usage: mksfoex [options] TITLE output.sfo\n");
 		fprintf(stderr, "\t-d NAME=VALUE   Add a new DWORD value\n");
@@ -286,12 +292,32 @@ int main(int argc, char **argv)
 
 		return 1;
 	}
-	
+
+	struct EntryContainer *entry_pbi = find_name("PUBTOOLINFO");
+	if (strncmp(entry_pbi->data, "c_date=", 7))
+	{
+		char pubtool_info[512];
+		if (strlen(entry_pbi->data))
+		{
+			time_t e_time = time(NULL);
+			struct tm *l_time = gmtime(&e_time);
+			snprintf(pubtool_info, 512, "c_date=%04d%02d%02d,sdk_ver=03570011,%s", l_time->tm_year + 1900, l_time->tm_mon + 1, l_time->tm_mday, entry_pbi->data);
+			entry_pbi->data = pubtool_info;
+		}
+		else
+		{
+			time_t e_time = time(NULL);
+			struct tm *l_time = gmtime(&e_time);
+			snprintf(pubtool_info, 512, "c_date=%04d%02d%02d,sdk_ver=03570011", l_time->tm_year + 1900, l_time->tm_mon + 1, l_time->tm_mday);
+			entry_pbi->data = pubtool_info;
+		}
+	}
+
 	if (g_title)
 	{
 		struct EntryContainer *entry = find_name("TITLE");
 		entry->data = g_title;
-		
+
 		entry = find_name("STITLE");
 		entry->data = g_title;
 	}
@@ -335,7 +361,7 @@ int main(int argc, char **argv)
 			SW(&e->valsize, valsize);
 			SW(&e->totalsize, totalsize);
 			memset(d, 0, totalsize);
-			
+
 			if (g_vals[i].data)
 				memcpy(d, g_vals[i].data, valsize);
 			d += totalsize;
@@ -352,7 +378,7 @@ int main(int argc, char **argv)
 		k++;
 		align--;
 	}
-	
+
 	SW(&h->valofs, keyofs + (k-keys));
 
 	fp = fopen(g_filename, "wb");

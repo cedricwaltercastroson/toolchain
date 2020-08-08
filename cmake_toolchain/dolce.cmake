@@ -1,5 +1,6 @@
 ## DolceSDK Toolchain CMake functions
 ## Copyright (C) 2020 Asakura Reiko
+## Copyright (C) 2020 GrapheneCt
 ##
 ## This program is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -209,6 +210,7 @@ endfunction(dolce_create_stubs)
 ##   dolce_create_vpk(target titleid eboot
 ##                   [VERSION version]
 ##                   [NAME name]
+##                   [CONTENT_ID_LABEL label]
 ##                   [FILE path dest])
 ##
 ## @param target
@@ -223,6 +225,8 @@ endfunction(dolce_create_stubs)
 ##   A version string
 ## @param[opt] NAME
 ##   The display name under the bubble in LiveArea
+## @param[opt] CONTENT_ID_LABEL
+##   The 16 character label part of the content ID
 ## @param[opt] FILE
 ##   Add an additional file at path to dest in the vpk (there can be multiple
 ##   of this parameter).
@@ -231,7 +235,7 @@ function(dolce_create_vpk target titleid eboot)
   set(DOLCE_MKSFOEX_FLAGS "${DOLCE_MKSFOEX_FLAGS}" CACHE STRING "dolce-mksfoex flags")
   set(DOLCE_PACK_VPK_FLAGS "${DOLCE_PACK_VPK_FLAGS}" CACHE STRING "dolce-pack-vpk flags")
 
-  set(oneValueArgs VERSION NAME)
+  set(oneValueArgs VERSION NAME CONTENT_ID_LABEL)
   set(multiValueArgs FILE)
   cmake_parse_arguments(dolce_create_vpk "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
@@ -252,7 +256,15 @@ function(dolce_create_vpk target titleid eboot)
   if(dolce_create_vpk_VERSION)
     set(DOLCE_MKSFOEX_FLAGS "${DOLCE_MKSFOEX_FLAGS} -s APP_VER=${dolce_create_vpk_VERSION}")
   endif()
+
   set(DOLCE_MKSFOEX_FLAGS "${DOLCE_MKSFOEX_FLAGS} -s TITLE_ID=${titleid}")
+
+  if(NOT dolce_create_vpk_CONTENT_ID_LABEL)
+    set(DOLCE_MKSFOEX_FLAGS "${DOLCE_MKSFOEX_FLAGS} -s CONTENT_ID=HB0000-${titleid}_00-${titleid}0000000")
+  else()
+    set(DOLCE_MKSFOEX_FLAGS "${DOLCE_MKSFOEX_FLAGS} -s CONTENT_ID=HB0000-${titleid}_00-${dolce_create_vpk_CONTENT_ID_LABEL}")
+  endif()
+
   if(NOT dolce_create_vpk_NAME)
     set(dolce_create_vpk_NAME "${PROJECT_NAME}")
   endif()
