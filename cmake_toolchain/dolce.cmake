@@ -310,8 +310,8 @@ endfunction(dolce_create_vpk)
 ## FUNCTION: dolce_gen_libs
 ##
 ## Generate stub libraries from a NID database
-##   dolce_create_stubs(target-dir source
-##                     [LIB lib1 [lib2 ...]])
+##   dolce_gen_libs(target-dir source
+##                 [LIB lib1 [lib2 ...]])
 ##
 ## @param target-dir
 ##   Name for a directory containing generated stub libraries
