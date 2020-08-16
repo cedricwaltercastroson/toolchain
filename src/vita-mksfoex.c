@@ -32,6 +32,8 @@ See LICENSE/pspsdk
 #include "getopt.h"
 #include "types.h"
 
+#define SCE_PSP2_SDK_VERSION 0x03570011
+
 #define PSF_MAGIC	0x46535000
 #define PSF_VERSION  0x00000101
 
@@ -293,25 +295,29 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
+	char pubtool_info[512] = {0};
+	char pbi_c_date[64] = {0};
+	char pbi_sdk_ver[64] = {0};
 	struct EntryContainer *entry_pbi = find_name("PUBTOOLINFO");
-	if (strncmp(entry_pbi->data, "c_date=", 7))
+
+	if (strstr(entry_pbi->data, "c_date=") == NULL)
 	{
-		char pubtool_info[512];
-		if (strlen(entry_pbi->data))
-		{
-			time_t e_time = time(NULL);
-			struct tm *l_time = gmtime(&e_time);
-			snprintf(pubtool_info, 512, "c_date=%04d%02d%02d,sdk_ver=03570011,%s", l_time->tm_year + 1900, l_time->tm_mon + 1, l_time->tm_mday, entry_pbi->data);
-			entry_pbi->data = pubtool_info;
-		}
-		else
-		{
-			time_t e_time = time(NULL);
-			struct tm *l_time = gmtime(&e_time);
-			snprintf(pubtool_info, 512, "c_date=%04d%02d%02d,sdk_ver=03570011", l_time->tm_year + 1900, l_time->tm_mon + 1, l_time->tm_mday);
-			entry_pbi->data = pubtool_info;
-		}
+		time_t e_time = time(NULL);
+		struct tm *l_time = gmtime(&e_time);
+		snprintf(pbi_c_date, sizeof(pbi_c_date), "c_date=%04d%02d%02d", l_time->tm_year + 1900, l_time->tm_mon + 1, l_time->tm_mday);
 	}
+
+	if (strstr(entry_pbi->data, "sdk_ver=") == NULL)
+	{
+		snprintf(pbi_sdk_ver, sizeof(pbi_sdk_ver), "sdk_ver=%08X", SCE_PSP2_SDK_VERSION);
+	}
+
+	snprintf(pubtool_info, sizeof(pubtool_info), "%s,%s%s%s",
+		pbi_c_date,
+		pbi_sdk_ver,
+		strlen(entry_pbi->data) > 0 ? "," : "",
+		entry_pbi->data);
+	entry_pbi->data = pubtool_info;
 
 	if (g_title)
 	{
