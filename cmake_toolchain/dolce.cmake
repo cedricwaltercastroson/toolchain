@@ -57,9 +57,6 @@ include(CMakeParseArguments)
 ##   Path to a binary file specifying the boot param section of the SELF
 ##
 function(dolce_create_self target source)
-  set(DOLCE_ELF_CREATE_FLAGS "${DOLCE_ELF_CREATE_FLAGS}" CACHE STRING "dolce-elf-create flags")
-  set(DOLCE_MAKE_FSELF_FLAGS "${DOLCE_MAKE_FSELF_FLAGS}" CACHE STRING "dolce-make-fself flags")
-
   set(options UNCOMPRESSED UNSAFE)
   set(oneValueArgs CONFIG BOOT_PARAM)
   cmake_parse_arguments(dolce_create_self "${options}" "${oneValueArgs}" "" ${ARGN})
@@ -135,9 +132,6 @@ endfunction(dolce_create_self)
 ##   Specifies that this module makes kernel exports
 ##
 function(dolce_create_stubs target-dir source config)
-  set(DOLCE_ELF_EXPORT_FLAGS "${DOLCE_ELF_EXPORT_FLAGS}" CACHE STRING "dolce-elf-export flags")
-  set(DOLCE_LIBS_GEN_FLAGS "${DOLCE_LIBS_GEN_FLAGS}" CACHE STRING "dolce-libs-gen flags")
-
   set(options KERNEL)
   set(multiValueArgs LIB)
   cmake_parse_arguments(dolce_create_stubs "${options}" "" "${multiValueArgs}" ${ARGN})
@@ -232,9 +226,6 @@ endfunction(dolce_create_stubs)
 ##   of this parameter).
 ##
 function(dolce_create_vpk target titleid eboot)
-  set(DOLCE_MKSFOEX_FLAGS "${DOLCE_MKSFOEX_FLAGS}" CACHE STRING "dolce-mksfoex flags")
-  set(DOLCE_PACK_VPK_FLAGS "${DOLCE_PACK_VPK_FLAGS}" CACHE STRING "dolce-pack-vpk flags")
-
   set(oneValueArgs VERSION NAME CONTENT_ID_LABEL)
   set(multiValueArgs FILE)
   cmake_parse_arguments(dolce_create_vpk "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
@@ -321,8 +312,6 @@ endfunction(dolce_create_vpk)
 ##   Stub libraries to create targets for. This argument can be given multiple times.
 ##
 function(dolce_gen_libs target-dir source)
-  set(DOLCE_LIBS_GEN_FLAGS "${DOLCE_LIBS_GEN_FLAGS}" CACHE STRING "dolce-libs-gen flags")
-
   set(multiValueArgs LIB)
   cmake_parse_arguments(dolce_gen_libs "" "" "${multiValueArgs}" ${ARGN})
 
