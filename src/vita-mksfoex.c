@@ -81,7 +81,7 @@ struct EntryContainer g_defaults[] = {
 	{ "PUBTOOLINFO", PSF_TYPE_STR, 512, "" },
 	{ "REGION_DENY", PSF_TYPE_VAL, 0, NULL },
 	{ "SAVEDATA_MAX_SIZE", PSF_TYPE_VAL, 0x100000, NULL }, // 1GiB, recommended by Sony as default
-	{ "STITLE", PSF_TYPE_STR, 52, "Homebrew" },
+	{ "STITLE", PSF_TYPE_STR, 52, "" },
 	{ "TITLE", PSF_TYPE_STR, 128, "Homebrew" },
 	{ "TITLE_ID", PSF_TYPE_STR, 12, "ABCD99999" },
 	{ "VERSION", PSF_TYPE_STR, 8, "01.00" }, // master version
@@ -317,9 +317,12 @@ int main(int argc, char **argv)
 	{
 		struct EntryContainer *entry = find_name("TITLE");
 		entry->data = g_title;
+	}
 
-		entry = find_name("STITLE");
-		entry->data = g_title;
+	struct EntryContainer *entry_stitle = find_name("STITLE");
+	if (strlen(entry_stitle->data) == 0)
+	{
+		entry_stitle->data = find_name("TITLE")->data;
 	}
 
 	memset(head, 0, sizeof(head));
