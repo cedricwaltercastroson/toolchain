@@ -32,7 +32,7 @@ cd ${CWD}
 mkdir build
 cd build
 cmake -G"Unix Makefiles" \
-	-DCMAKE_C_FLAGS_RELEASE:STRING="-O3 -DNDEBUG -DZIP_STATIC" \
+	-DCMAKE_C_FLAGS_RELEASE:STRING="-O3 -DNDEBUG" \
 	-DCMAKE_BUILD_TYPE=Release \
 	-DBUILD_SHARED_LIBS=`[ "$OS" = Windows_NT ] && echo ON || echo OFF` \
 	-Dlibyaml_INCLUDE_DIR=${DEPSDIR}/include/ \

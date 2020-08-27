@@ -17,10 +17,6 @@ if(USE_BUNDLED_ENDIAN_H)
 	add_definitions(-DUSE_BUNDLED_ENDIAN_H)
 endif()
 
-if(DEFINED ZIP_STATIC)
-	add_definitions(-DZIP_STATIC)
-endif()
-
 if (WIN32)
 	# See "Dynamic-Link Library Search Order (Windows)
 	# Standard Search Order for Desktop Applications"
