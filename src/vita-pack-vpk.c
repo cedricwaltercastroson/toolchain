@@ -1,11 +1,18 @@
-#include <stdio.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <dirent.h>
 #include <getopt.h>
+#include <libgen.h>
+#include <limits.h>
+#include <unistd.h>
 #include <zip.h>
+
+#ifdef __MINGW64__
+#include <libloaderapi.h>
+#endif
 
 #define DEFAULT_OUTPUT_FILE "output.vpk"
 #ifndef PATH_MAX
@@ -55,7 +62,17 @@ static struct {
 	char **src;
 	char **dst;
 	int num;
-} additional_list;
+} additional_list = {NULL, NULL, 0};
+
+static bool additional_list_exists(char *dst)
+{
+	for (int i = 0; i < additional_list.num; i++) {
+		if (0 == strcmp(additional_list.dst[i], dst)) {
+			return true;
+		}
+	}
+	return false;
+}
 
 static void additional_list_add(char *src, char *dst)
 {
@@ -70,11 +87,28 @@ static void additional_list_add(char *src, char *dst)
 	additional_list.num++;
 }
 
-static void additional_list_init()
+static void add_default_right_suprx(void)
 {
-	additional_list.src = NULL;
-	additional_list.dst = NULL;
-	additional_list.num = 0;
+	char exe_path[PATH_MAX + 1] = {0};
+
+#ifdef __MINGW64__
+	if (0 == GetModuleFileNameA(NULL, exe_path, PATH_MAX)) {
+		return;
+	}
+#else
+	if (readlink("/proc/self/exe", exe_path, PATH_MAX) < 0) {
+		return;
+	}
+#endif
+
+	char *src = calloc(PATH_MAX + 1, sizeof(char));
+	strcpy(src, dirname(exe_path));
+	strcat(src, "/../arm-dolce-eabi/module/right.suprx");
+
+	char *dst = calloc(PATH_MAX + 1, sizeof(char));
+	strcat(dst, "sce_sys/about/right.suprx");
+
+	additional_list_add(src, dst);
 }
 
 static void additional_list_free()
@@ -133,8 +167,6 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 
-	additional_list_init();
-
 	while ((opt = getopt_long(argc, argv, "hs:b:a:", long_options, NULL)) != -1) {
 		switch (opt) {
 		case 's':
@@ -150,6 +182,12 @@ int main(int argc, char *argv[])
 			usage(argv[0]);
 			goto error_wrong_args;
 		}
+	}
+
+	if (!additional_list_exists("sce_sys/about/right.suprx")
+			&& (additional_list_exists("sce_sys/about/right.gim")
+				|| additional_list_exists("sce_sys/about/right.txt"))) {
+		add_default_right_suprx();
 	}
 
 	if (!sfo) {
