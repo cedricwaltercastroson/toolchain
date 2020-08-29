@@ -4,5 +4,14 @@ os:
   - osx
 dist: bionic
 osx_image: xcode11.3
+addons:
+  apt:
+    sources:
+    - sourceline: 'deb https://apt.kitware.com/ubuntu/ bionic main'
+      key_url: 'https://apt.kitware.com/keys/kitware-archive-latest.asc'
+    packages:
+    - cmake
+before_script:
+- sudo rm -rf /usr/local/cmake-* # workaround to remove default cmake that has priority in PATH
 script:
   - "bash ./build.sh"
