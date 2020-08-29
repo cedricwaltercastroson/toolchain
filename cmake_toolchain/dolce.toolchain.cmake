@@ -58,7 +58,7 @@ set( DOLCE_ELF_EXPORT      "${DOLCESDK}/bin/dolce-elf-export${TOOL_OS_SUFFIX}"  
 set( DOLCE_LIBS_GEN        "${DOLCESDK}/bin/dolce-libs-gen${TOOL_OS_SUFFIX}"        CACHE PATH "dolce-libs-gen" )
 set( DOLCE_MAKE_FSELF      "${DOLCESDK}/bin/dolce-make-fself${TOOL_OS_SUFFIX}"      CACHE PATH "dolce-make-fself" )
 set( DOLCE_MKSFOEX         "${DOLCESDK}/bin/dolce-mksfoex${TOOL_OS_SUFFIX}"         CACHE PATH "dolce-mksfoex" )
-set( DOLCE_PACK_VPK        "${DOLCESDK}/bin/dolce-pack-vpk${TOOL_OS_SUFFIX}"        CACHE PATH "dolce-pack-vpk" )
+set( DOLCE_MAKE_PKG        "${DOLCESDK}/bin/dolce-make-pkg"                         CACHE PATH "dolce-make-pkg" )
 set( DOLCE_MAKE_BOOTPARAM  "${DOLCESDK}/bin/dolce-make-bootparam${TOOL_OS_SUFFIX}"  CACHE PATH "dolce-make-bootparam" )
 
 # cache flags

@@ -18,9 +18,6 @@ cmake ../buildscripts
 echo "[Step 1.1] Build zlib..."
 cmake --build . --target zlib_build -- ${JOBS}
 
-echo "[Step 1.2] Build libzip..."
-cmake --build . --target libzip_build -- ${JOBS}
-
 echo "[Step 1.3] Build libelf..."
 cmake --build . --target libelf_build -- ${JOBS}
 
@@ -41,7 +38,5 @@ cmake -G"Unix Makefiles" \
 	-Dlibelf_LIBRARY=${DEPSDIR}/lib/libelf.a \
 	-Dzlib_INCLUDE_DIR=${DEPSDIR}/include/ \
 	-Dzlib_LIBRARY=${DEPSDIR}/lib/libz.a \
-	-Dlibzip_INCLUDE_DIR=${DEPSDIR}/include/ \
-	-Dlibzip_CONFIG_INCLUDE_DIR=${DEPSDIR}/lib/libzip/include \
-	-Dlibzip_LIBRARY=${DEPSDIR}/lib/libzip.a  ../
+	..
 cmake --build . -- ${JOBS}

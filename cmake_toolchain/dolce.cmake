@@ -23,7 +23,7 @@
 ##   - DOLCE_ELF_EXPORT_FLAGS
 ##   - DOLCE_LIBS_GEN_FLAGS
 ##   - DOLCE_MKSFOEX_FLAGS
-##   - DOLCE_PACK_VPK_FLAGS
+##   - DOLCE_MAKE_PKG_FLAGS
 
 ## add_include_guard() has been added in 3.10, but it's too recent so we don't use it
 if(__DOLCE_CMAKE_INCLUDED__)
@@ -200,12 +200,14 @@ endfunction(dolce_create_stubs)
 ##################################################
 ## FUNCTION: dolce_create_vpk
 ##
-## Creates a homebrew VPK from a SELF
-##   dolce_create_vpk(target titleid eboot
-##                   [VERSION version]
-##                   [NAME name]
-##                   [CONTENT_ID_LABEL label]
-##                   [FILE path dest])
+## Creates a homebrew package.
+##   dolce_create_vpk(target
+##                    titleid
+##                    eboot
+##                    [VERSION version]
+##                    [NAME name]
+##                    [CONTENT_ID_LABEL label]
+##                    [FILE path dest])
 ##
 ## @param target
 ##   A CMake custom target of this given name
@@ -222,42 +224,42 @@ endfunction(dolce_create_stubs)
 ## @param[opt] CONTENT_ID_LABEL
 ##   The 16 character label part of the content ID
 ## @param[opt] FILE
-##   Add an additional file at path to dest in the vpk (there can be multiple
+##   Add an additional file at path to dest in the pkg (there can be multiple
 ##   of this parameter).
 ##
 function(dolce_create_vpk target titleid eboot)
   set(oneValueArgs VERSION NAME CONTENT_ID_LABEL)
   set(multiValueArgs FILE)
-  cmake_parse_arguments(dolce_create_vpk "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+  cmake_parse_arguments(arg "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
-  list(LENGTH dolce_create_vpk_FILE left)
+  list(LENGTH arg_FILE left)
   while(left GREATER 0)
     if(left EQUAL 1)
       message(FATAL_ERROR "Invalid number of arguments")
     endif()
-    list(GET dolce_create_vpk_FILE 0 fname)
-    list(GET dolce_create_vpk_FILE 1 fdest)
+    list(GET arg_FILE 0 fname)
+    list(GET arg_FILE 1 fdest)
     get_filename_component(fpath ${fname} ABSOLUTE)
     list(APPEND resources "${fpath}")
-    list(REMOVE_AT dolce_create_vpk_FILE 0 1)
-    set(DOLCE_PACK_VPK_FLAGS "${DOLCE_PACK_VPK_FLAGS} -a ${fpath}=${fdest}")
-    list(LENGTH dolce_create_vpk_FILE left)
+    list(REMOVE_AT arg_FILE 0 1)
+    set(DOLCE_MAKE_PKG_FLAGS "${DOLCE_MAKE_PKG_FLAGS} --add \"${fpath}\" \"${fdest}\"")
+    list(LENGTH arg_FILE left)
   endwhile()
 
-  if(dolce_create_vpk_VERSION)
-    set(DOLCE_MKSFOEX_FLAGS "${DOLCE_MKSFOEX_FLAGS} -s APP_VER=${dolce_create_vpk_VERSION}")
+  if(arg_VERSION)
+    set(DOLCE_MKSFOEX_FLAGS "${DOLCE_MKSFOEX_FLAGS} -s APP_VER=${arg_VERSION}")
   endif()
 
   set(DOLCE_MKSFOEX_FLAGS "${DOLCE_MKSFOEX_FLAGS} -s TITLE_ID=${titleid}")
 
-  if(NOT dolce_create_vpk_CONTENT_ID_LABEL)
+  if(NOT arg_CONTENT_ID_LABEL)
     set(DOLCE_MKSFOEX_FLAGS "${DOLCE_MKSFOEX_FLAGS} -s CONTENT_ID=HB0000-${titleid}_00-${titleid}0000000")
   else()
-    set(DOLCE_MKSFOEX_FLAGS "${DOLCE_MKSFOEX_FLAGS} -s CONTENT_ID=HB0000-${titleid}_00-${dolce_create_vpk_CONTENT_ID_LABEL}")
+    set(DOLCE_MKSFOEX_FLAGS "${DOLCE_MKSFOEX_FLAGS} -s CONTENT_ID=HB0000-${titleid}_00-${arg_CONTENT_ID_LABEL}")
   endif()
 
-  if(NOT dolce_create_vpk_NAME)
-    set(dolce_create_vpk_NAME "${PROJECT_NAME}")
+  if(NOT arg_NAME)
+    set(arg_NAME "${PROJECT_NAME}")
   endif()
 
   ## check eboot for being a target, otherwise it is a file path
@@ -271,22 +273,30 @@ function(dolce_create_vpk target titleid eboot)
   ## PARAM.SFO command
   separate_arguments(DOLCE_MKSFOEX_FLAGS)
   add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${target}_param.sfo
-    COMMAND ${DOLCE_MKSFOEX} ${DOLCE_MKSFOEX_FLAGS} ${dolce_create_vpk_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${target}_param.sfo
+    COMMAND ${DOLCE_MKSFOEX} ${DOLCE_MKSFOEX_FLAGS} ${arg_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${target}_param.sfo
     DEPENDS ${sourcepath}
     COMMENT "Generating param.sfo for ${target}"
   )
 
-  ## VPK command
-  separate_arguments(DOLCE_PACK_VPK_FLAGS)
+  ## PKG command
+  set(pkg_format vpk)
+  set(pkg_type app)
+  separate_arguments(DOLCE_MAKE_PKG_FLAGS)
   add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${target}
-    COMMAND ${DOLCE_PACK_VPK} ${DOLCE_PACK_VPK_FLAGS} -s ${CMAKE_CURRENT_BINARY_DIR}/${target}_param.sfo -b ${sourcepath} ${CMAKE_CURRENT_BINARY_DIR}/${target}
+    COMMAND ${DOLCE_MAKE_PKG}
+      --format ${pkg_format}
+      --type ${pkg_type}
+      --add "${CMAKE_CURRENT_BINARY_DIR}/${target}_param.sfo" sce_sys/param.sfo
+      --add ${sourcepath} eboot.bin
+      ${DOLCE_MAKE_PKG_FLAGS}
+      "${CMAKE_CURRENT_BINARY_DIR}/${target}"
     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${target}_param.sfo
     DEPENDS ${sourcepath}
     DEPENDS ${resources}
-    COMMENT "Building vpk ${target}"
+    COMMENT "Building ${pkg_format} ${pkg_type} ${target}"
   )
 
-  ## VPK target
+  ## PKG target
   add_custom_target(${target}.target
     ALL
     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${target}

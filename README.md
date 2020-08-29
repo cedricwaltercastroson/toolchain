@@ -82,25 +82,38 @@ recommended that you use `XXXXYYYYY` where `XXXX` is an author specific
 identifier and `YYYYY` is a unique number identifying your homebrew. For
 example, molecularShell uses `MLCL00001`.
 
-### dolce-pack-vpk
+### dolce-make-pkg
 ```
-Usage:
-    dolce-pack-vpk [OPTIONS] output.vpk
+Usage: dolce-make-pkg [-h] [-v] [-f {pkg,vpk}]
+                      [-t {app,patch,addcont,theme}] [-a SRC DST]
+                      OUTPUT
 
-  -s, --sfo=param.sfo     sets the param.sfo file
-  -b, --eboot=eboot.bin   sets the eboot.bin file
-  -a, --add src=dst       adds the file src to the vpk as dst
-  -h, --help              displays this help and exit
+Package files for distribution.
+
+positional arguments:
+  OUTPUT                Output file path.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -v, --verbose         Print more information.
+  -f {pkg,vpk}, --format {pkg,vpk}
+                        Output file format.
+  -t {app,patch,addcont,theme}, --type {app,patch,addcont,theme}
+                        Package content type.
+  -a SRC DST, --add SRC DST
+                        Add file to package.
+
 ```
-Generates a VPK homebrew package. `eboot.bin` and `param.sfo` are required.
+Generates a homebrew package. Currently only `vpk` format and `app` type are supported.
+For `app` type, `eboot.bin` and `sce_sys/param.sfo` are required.
+Files may be added automatically depending on type.
 
 ## Development
-Required libraries are 
-[libelf](http://www.mr511.de/software/libelf-0.8.13.tar.gz), 
-[zlib](http://zlib.net/zlib-1.2.8.tar.gz), 
-[libzip](https://nih.at/libzip/libzip-1.1.3.tar.gz), and 
-[libyaml](http://pyyaml.org/download/libyaml/yaml-0.1.7.tar.gz). Please note 
-that there are some compatibility problems with built-in libelf so it is 
+Required libraries are
+[libelf](http://www.mr511.de/software/libelf-0.8.13.tar.gz),
+[zlib](http://zlib.net/zlib-1.2.8.tar.gz), and
+[libyaml](http://pyyaml.org/download/libyaml/yaml-0.1.7.tar.gz). Please note
+that there are some compatibility problems with built-in libelf so it is
 recommended that you download it from the provided link.
 
 After getting the dependencies, build with
