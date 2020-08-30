@@ -163,7 +163,27 @@ if args.type == 'app':
 	if right_suprx not in pathmap and (right_gim in pathmap or right_png in pathmap):
 		default = lookup_default('arm-dolce-eabi/module/right.suprx')
 		if default:
-			process_paths(pathmap, ((default, 'sce_sys/about/right.suprx'),), verbose=args.verbose)
+			process_paths(pathmap, ((default, right_suprx),), verbose=args.verbose)
+
+	icon0 = pathlib.Path('sce_sys/icon0.png')
+	if icon0 not in pathmap:
+		default = lookup_default('share/livearea/icon0.png')
+		if default:
+			process_paths(pathmap, ((default, icon0),), verbose=args.verbose)
+
+	pic0 = pathlib.Path('sce_sys/pic0.png')
+	if pic0 not in pathmap:
+		default = lookup_default('share/livearea/pic0.png')
+		if default:
+			process_paths(pathmap, ((default, pic0),), verbose=args.verbose)
+
+	la = pathlib.Path('sce_sys/livearea/contents/template.xml')
+	bg = pathlib.Path('sce_sys/livearea/contents/bg0.png')
+	if la not in pathmap:
+		default_la = lookup_default('share/livearea/template.xml')
+		default_bg = lookup_default('share/livearea/bg0.png')
+		if default_la and default_bg:
+			process_paths(pathmap, ((default_la, la), (default_bg, bg)), verbose=args.verbose)
 
 # validate
 
