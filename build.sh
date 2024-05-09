@@ -8,7 +8,7 @@ DEPSDIR=$PWD/builds/deps_build
 JOBS=-j`getconf _NPROCESSORS_ONLN || sysctl kern.smp.cpus | sed 's/kern.smp.cpus: //'` || true
 
 echo "[Step 0.0] Clone buildscripts..."
-git clone https://github.com/DolceSDK/buildscripts
+git clone https://github.com/vitasdk/buildscripts
 
 echo "[Step 1.0] Prepare buildscripts..."
 mkdir -p ${BUILDDIR}
@@ -27,7 +27,7 @@ cmake --build . --target libelf_build -- ${JOBS}
 echo "[Step 1.4] Build libyaml..."
 cmake --build . --target libyaml_build -- ${JOBS}
 
-echo "[Step 2.0] Build DolceSDK toolchain..."
+echo "[Step 2.0] Build VitaSDK toolchain..."
 cd ${CWD}
 mkdir build
 cd build

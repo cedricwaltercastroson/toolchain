@@ -1,3 +1,3 @@
-install(FILES dolce.cmake dolce.toolchain.cmake
+install(FILES vita.cmake vita.toolchain.cmake
   DESTINATION share
 )
